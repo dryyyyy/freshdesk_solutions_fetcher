@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -61,7 +62,11 @@ class FetchCommand extends ContainerAwareCommand
         $fdk->fetchArticles($fdk->getCategories()[$category], $languageCode);
 
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        try {
+            $sheet = $spreadsheet->getActiveSheet();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
         $sheet->setCellValue('A1', 'Topic');
         $sheet->setCellValue('B1', 'Question');
         $sheet->setCellValue('C1', 'Answer');
@@ -77,7 +82,11 @@ class FetchCommand extends ContainerAwareCommand
             }
         }
         $writer = new Xlsx($spreadsheet);
-        $writer->save("$filename.xlsx");
+        try {
+            $writer->save("$filename.xlsx");
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
         $io->success('Your file ' . $filename . '.xlsx is in: ' . getcwd());
     }
 }
